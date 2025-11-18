@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utils/styles.dart';
+import '../widgets/password_field.dart';
 
 class PageLogin extends StatelessWidget {
   @override
@@ -39,10 +40,7 @@ class PageLogin extends StatelessWidget {
                   children: [
                     TextField(decoration: AppInputStyles.emailField),
                     SizedBox(height: 10),
-                    TextField(
-                      obscureText: true,
-                      decoration: AppInputStyles.passwordField,
-                    ),
+                    PasswordField(),
                   ],
                 ),
               ),
