@@ -35,6 +35,23 @@ class AppButtonStyles {
     backgroundColor: AppColors.primary,
     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
   );
+
+  static ButtonStyle headerButton1 = ElevatedButton.styleFrom(
+    backgroundColor: Color(0xffc5bfbc),
+    foregroundColor: Colors.black,
+    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+  );
+
+  static ButtonStyle headerButton2 = ElevatedButton.styleFrom(
+    backgroundColor: Color(0xfffb4909),
+    foregroundColor: Color(0xffffffff),
+    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+  );
+  static ButtonStyle headerButton3 = ElevatedButton.styleFrom(
+    backgroundColor: Color(0xff79a94a),
+    foregroundColor: Color(0xffffffff),
+    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+  );
 }
 
 // 🎨 STYLE POUR LES CHAMPS DE TEXTE
@@ -61,6 +78,11 @@ class AppInputStyles {
 // 🧱 STYLE POUR LES BLOCS / CONTAINERS
 class AppBoxStyles {
   static BoxDecoration formContainer = BoxDecoration(
+    borderRadius: BorderRadius.circular(12),
+  );
+
+  static BoxDecoration headerContainer = BoxDecoration(
+    color: Color(0xff60873a), // ou autre couleur
     borderRadius: BorderRadius.circular(12),
   );
 }

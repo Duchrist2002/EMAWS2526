@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:helloworld/Screens/login_page.dart';
+import 'Screens/login_page.dart';
+import 'Screens/page_home.dart';
 
 void main() {
   runApp(MyApp());
@@ -9,7 +10,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: PageLogin(),
+      debugShowCheckedModeBanner: false, // supprime le bandeau DEBUG
+      initialRoute: '/', // page de démarrage
+      routes: {
+        '/': (context) => PageHome(), // page login par défaut
+        '/login': (context) => PageLogin(), // page d'accueil
+      },
     );
   }
 }

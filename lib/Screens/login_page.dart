@@ -3,6 +3,7 @@ import '../utils/styles.dart';
 import '../widgets/password_field.dart';
 
 class PageLogin extends StatelessWidget {
+  const PageLogin({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,8 +50,10 @@ class PageLogin extends StatelessWidget {
 
               ElevatedButton(
                 style: AppButtonStyles.primaryButton,
-                onPressed: () {},
-                child: Text("Se connecter", style: AppTextStyles.buttonText),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/home');
+                },
+                child: Text("Sign in", style: AppTextStyles.buttonText),
               ),
 
               SizedBox(height: 10), // petit espace entre les boutons
@@ -58,8 +61,18 @@ class PageLogin extends StatelessWidget {
               ElevatedButton(
                 style: AppButtonStyles.secondaryButton,
                 onPressed: () {},
-                child: Text("Créer un compte", style: AppTextStyles.buttonText),
+                child:
+                    Text("Create new account", style: AppTextStyles.buttonText),
               ),
+
+              SizedBox(height: 40), // petit espace entre les boutons
+
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text("Go Back to Home_Page"),
+              )
             ],
           ),
         ),
