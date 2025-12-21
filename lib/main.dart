@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'core/theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
+import 'screens/dashboard_screen.dart';
 
 /// UniBudget Main App Entry Point
 /// Mit Routing für Login, Sign-Up und später Dashboard
@@ -27,7 +28,7 @@ class UniBudgetApp extends StatelessWidget {
         '/': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
         // TODO: Dashboard und weitere Screens hinzufügen
-        // '/dashboard': (context) => const DashboardScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
         // '/add-expense': (context) => const AddExpenseScreen(),
         // '/history': (context) => const HistoryScreen(),
         // '/statistics': (context) => const StatisticsScreen(),
