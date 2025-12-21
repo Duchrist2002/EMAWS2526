@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../widgets/password_field.dart';
 
-class PageLogin extends StatelessWidget {
-  const PageLogin({Key? key}) : super(key: key);
+class PageRegister extends StatelessWidget {
+  const PageRegister({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +14,11 @@ class PageLogin extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // ===== TITRE =====
               Column(
                 children: const [
                   Text(
-                    "Login here",
+                    "Create Account",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -26,12 +27,16 @@ class PageLogin extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    "Welcome back! You’ve been missed!",
+                    "Join us and start managing your budget",
                     style: TextStyle(fontSize: 16, color: Colors.black),
+                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
+
               const SizedBox(height: 30),
+
+              // ===== FORM =====
               Container(
                 width: 300,
                 padding: const EdgeInsets.all(15),
@@ -40,58 +45,58 @@ class PageLogin extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    TextField(
-                      decoration: InputDecoration(
-                        labelText: "Email",
-                        filled: true,
-                        fillColor: const Color(0xfffcfefd),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                    ),
+                    _inputField("Full Name"),
+                    const SizedBox(height: 10),
+                    _inputField("Email"),
                     const SizedBox(height: 10),
                     const PasswordField(),
+                    const SizedBox(height: 10),
+                    _inputField("Confirm Password", isPassword: true),
                   ],
                 ),
               ),
+
               const SizedBox(height: 20),
+
+              // ===== BOUTONS =====
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff1f9829),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                 ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/');
-                },
+                onPressed: () {},
                 child: const Text(
-                  "Sign in",
+                  "Register",
                   style: TextStyle(fontSize: 18, color: Colors.white),
                 ),
               ),
+
               const SizedBox(height: 10),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xff1f9829),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-                ),
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: const Text(
-                  "Create new account",
-                  style: TextStyle(fontSize: 18, color: Colors.white),
-                ),
-              ),
-              const SizedBox(height: 40),
+
               TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Go Back to Home_Page"),
+                onPressed: () {
+                  Navigator.pushNamed(context, '/login');
+                },
+                child: const Text("Already have an account? Sign in"),
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  // ===== INPUT TEXT =====
+  Widget _inputField(String label, {bool isPassword = false}) {
+    return TextField(
+      obscureText: isPassword,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: const Color(0xfffcfefd),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
     );
