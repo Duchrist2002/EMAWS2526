@@ -46,7 +46,7 @@ class PageHome extends StatelessWidget {
                         ),
                         onPressed: () {
                           Navigator.pushNamed(context,
-                              '/register'); // ← redirection vers Register
+                              '/signup'); // ← redirection vers Register
                         },
                         child: const Text("Register"),
                       ),
