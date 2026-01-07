@@ -1,36 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart'; // Firebase core init
-import 'package:flutter/foundation.dart'
-    show kIsWeb; // To detect web at runtime
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'core/theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/page_home.dart';
+import 'screens/dashboard_screen.dart';
+import 'screens/Add_Expense.dart';
 
-/// Firebase config for Web (from Firebase Console -> Web app </> firebaseConfig)
 const FirebaseOptions webFirebaseOptions = FirebaseOptions(
-  apiKey: 'AIzaSyBBNeSkuI9w1whMOdjikMJUz3R-mn8mlDg', // firebaseConfig.apiKey
-  authDomain: 'unibudget-57295.firebaseapp.com', // firebaseConfig.authDomain
-  projectId: 'unibudget-57295', // firebaseConfig.projectId
-  storageBucket:
-      'unibudget-57295.firebasestorage.app', // firebaseConfig.storageBucket
-  messagingSenderId: '52016585420', // firebaseConfig.messagingSenderId
-  appId: '1:52016585420:web:4098c4aab678789e0b4069', // firebaseConfig.appId
+  apiKey: 'AIzaSyBBNeSkuI9w1whMOdjikMJUz3R-mn8mlDg',
+  authDomain: 'unibudget-57295.firebaseapp.com',
+  projectId: 'unibudget-57295',
+  storageBucket: 'unibudget-57295.firebasestorage.app',
+  messagingSenderId: '52016585420',
+  appId: '1:52016585420:web:4098c4aab678789e0b4069',
 );
 
-/// UniBudget Main App Entry Point
-/// Mit Routing für Login, Sign-Up und später Dashboard
 Future<void> main() async {
-  // Flutter binding initialisieren, bevor Plugins wie Firebase verwendet werden
   WidgetsFlutterBinding.ensureInitialized();
 
   if (kIsWeb) {
-    // Für Web müssen explizite FirebaseOptions übergeben werden,
-    // die exakt dem firebaseConfig aus der Firebase Console entsprechen.
     await Firebase.initializeApp(options: webFirebaseOptions);
   } else {
-    // Für Mobile/Desktop würden hier die nativen Config-Dateien gelesen.
     await Firebase.initializeApp();
   }
 
@@ -45,21 +38,15 @@ class UniBudgetApp extends StatelessWidget {
     return MaterialApp(
       title: 'UniBudget',
       debugShowCheckedModeBanner: false,
-
-      // App Theme aus theme.dart
       theme: AppTheme.lightTheme,
-
-      // Start mit Login Screen (aktuell zeigt '/' noch auf PageHome – kannst du später ändern)
-      initialRoute: '/',
-
-      // Routing Setup
+      initialRoute: '/login',
       routes: {
         '/': (context) => const PageHome(),
         '/login': (context) => const LoginScreen(),
         '/signup': (context) => const SignUpScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
+        '/add_expense': (context) => const AddExpenseScreen(),
       },
-
-      // Temporärer Fallback für Dashboard (bis implementiert)
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
           builder: (context) => Scaffold(
@@ -79,7 +66,7 @@ class UniBudgetApp extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Dashboard',
+                    'Page non trouvée',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -88,7 +75,7 @@ class UniBudgetApp extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Wird bald implementiert!',
+                    'La route "${settings.name}" n\'existe pas.',
                     style: TextStyle(
                       fontSize: 18,
                       color: AppTheme.darkText,
@@ -99,7 +86,7 @@ class UniBudgetApp extends StatelessWidget {
                     onPressed: () {
                       Navigator.pushNamedAndRemoveUntil(
                         context,
-                        '/',
+                        '/login',
                         (route) => false,
                       );
                     },
@@ -110,7 +97,7 @@ class UniBudgetApp extends StatelessWidget {
                         vertical: 16,
                       ),
                     ),
-                    child: const Text('Zurück zum Login'),
+                    child: const Text('Retour au Login'),
                   ),
                 ],
               ),
