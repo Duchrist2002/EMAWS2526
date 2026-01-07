@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Für Firebase Auth Fehler
 import '../core/theme.dart';
 import '../widgets/custom_input_field.dart';
+import '../services/auth_service.dart'; // Dein AuthService
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -14,6 +16,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  bool _isLoading = false; // Zeigt Ladezustand während Login an
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -21,12 +25,61 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // TODO: Implementiere Firebase Auth Login
+  // Firebase Auth Login über AuthService
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      // Temporär: Navigation zum Dashboard
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // 1) Nutzer per E-Mail/Passwort anmelden
+      final user = await AuthService.instance.signInWithEmail(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Login fehlgeschlagen. Bitte erneut versuchen.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // 2) Navigation nach erfolgreichem Login
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    } on FirebaseAuthException catch (e) {
+      // Typische FirebaseAuth Fehler abfangen
+      String message = 'Login fehlgeschlagen';
+
+      if (e.code == 'user-not-found') {
+        message = 'Kein Benutzer mit dieser E-Mail gefunden';
+      } else if (e.code == 'wrong-password') {
+        message = 'Falsches Passwort';
+      } else if (e.code == 'invalid-email') {
+        message = 'Ungültige E-Mail-Adresse';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } catch (_) {
+      // Generischer Fehler-Fallback
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unerwarteter Fehler beim Login'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        setState(() => _isLoading = false);
       }
     }
   }
@@ -136,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _handleLogin,
+                      onPressed: _isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.oliveGreen,
                         foregroundColor: AppTheme.whiteInput,
@@ -145,13 +198,24 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         elevation: 3,
                       ),
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Text(
+                              'Sign in',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
 

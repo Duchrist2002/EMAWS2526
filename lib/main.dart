@@ -1,12 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart'; // Firebase core init
+import 'package:flutter/foundation.dart'
+    show kIsWeb; // To detect web at runtime
+
 import 'core/theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'screens/page_home.dart';
 
+/// Firebase config for Web (from Firebase Console -> Web app </> firebaseConfig)
+const FirebaseOptions webFirebaseOptions = FirebaseOptions(
+  apiKey: 'AIzaSyBBNeSkuI9w1whMOdjikMJUz3R-mn8mlDg', // firebaseConfig.apiKey
+  authDomain: 'unibudget-57295.firebaseapp.com', // firebaseConfig.authDomain
+  projectId: 'unibudget-57295', // firebaseConfig.projectId
+  storageBucket:
+      'unibudget-57295.firebasestorage.app', // firebaseConfig.storageBucket
+  messagingSenderId: '52016585420', // firebaseConfig.messagingSenderId
+  appId: '1:52016585420:web:4098c4aab678789e0b4069', // firebaseConfig.appId
+);
+
 /// UniBudget Main App Entry Point
 /// Mit Routing für Login, Sign-Up und später Dashboard
-void main() => runApp(const UniBudgetApp());
+Future<void> main() async {
+  // Flutter binding initialisieren, bevor Plugins wie Firebase verwendet werden
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (kIsWeb) {
+    // Für Web müssen explizite FirebaseOptions übergeben werden,
+    // die exakt dem firebaseConfig aus der Firebase Console entsprechen.
+    await Firebase.initializeApp(options: webFirebaseOptions);
+  } else {
+    // Für Mobile/Desktop würden hier die nativen Config-Dateien gelesen.
+    await Firebase.initializeApp();
+  }
+
+  runApp(const UniBudgetApp());
+}
 
 class UniBudgetApp extends StatelessWidget {
   const UniBudgetApp({Key? key}) : super(key: key);
@@ -20,7 +49,7 @@ class UniBudgetApp extends StatelessWidget {
       // App Theme aus theme.dart
       theme: AppTheme.lightTheme,
 
-      // Start mit Login Screen
+      // Start mit Login Screen (aktuell zeigt '/' noch auf PageHome – kannst du später ändern)
       initialRoute: '/',
 
       // Routing Setup
