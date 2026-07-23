@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../core/theme.dart';
+
+import '../services/auth_service.dart';
 import '../widgets/custom_input_field.dart';
 
-/// Sign Up Screen - Ähnlicher Stil wie Login Screen
-/// TODO: Später Firebase Auth Registration einbinden
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -17,6 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -27,39 +27,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  // TODO: Implementiere Firebase Auth Registration
   Future<void> _handleSignUp() async {
-    if (_formKey.currentState!.validate()) {
-      if (_passwordController.text != _confirmPasswordController.text) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Passwörter stimmen nicht überein'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
+    if (!_formKey.currentState!.validate()) return;
 
-      // Hier kommt später die Firebase Auth Registrierungs-Logik
-      // await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      //   email: _emailController.text,
-      //   password: _passwordController.text,
-      // );
-      // await FirebaseAuth.instance.currentUser?.updateDisplayName(_nameController.text);
-
-      // TODO: Benutzer in Firestore speichern
-
-      // Temporär: Navigation zum Dashboard
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
-      }
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _showError('Passwords do not match.');
+      return;
     }
+
+    setState(() => _loading = true);
+    try {
+      await AuthService.instance.signUp(
+        name: _nameController.text,
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      // On success AuthGate swaps to the dashboard; leave the signup route.
+      if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+    } on AuthException catch (e) {
+      _showError(e.message);
+    } catch (_) {
+      _showError('Something went wrong. Please try again.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
     return Scaffold(
-      backgroundColor: AppTheme.peachBackground,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -70,47 +79,30 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-
-                  // "Create Account" - Große Headline
                   Text(
                     'Create Account',
-                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                          color: AppTheme.darkGreen,
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: theme.textTheme.displayLarge!
+                        .copyWith(fontSize: 36, fontWeight: FontWeight.bold),
                   ),
-
                   const SizedBox(height: 16),
-
-                  // "Create an account to get started" - Subtitle
                   Text(
                     'Create an account to get started',
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: AppTheme.darkText,
-                          fontSize: 18,
-                        ),
+                    style: TextStyle(color: onSurface, fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
-
                   const SizedBox(height: 48),
-
-                  // Name Input Field
                   CustomInputField(
                     controller: _nameController,
                     hintText: 'Full Name',
                     prefixIcon: Icons.person_outline,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Bitte Namen eingeben';
+                        return 'Please enter your name';
                       }
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Email Input Field
                   CustomInputField(
                     controller: _emailController,
                     hintText: 'Email',
@@ -118,18 +110,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Bitte E-Mail eingeben';
+                        return 'Please enter your email';
                       }
-                      if (!value.contains('@')) {
-                        return 'Ungültige E-Mail';
-                      }
+                      if (!value.contains('@')) return 'Invalid email address';
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Password Input Field
                   CustomInputField(
                     controller: _passwordController,
                     hintText: 'Password',
@@ -137,18 +124,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Bitte Passwort eingeben';
+                        return 'Please enter a password';
                       }
                       if (value.length < 6) {
-                        return 'Passwort muss mindestens 6 Zeichen lang sein';
+                        return 'Password must be at least 6 characters';
                       }
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Confirm Password Input Field
                   CustomInputField(
                     controller: _confirmPasswordController,
                     hintText: 'Confirm Password',
@@ -156,59 +140,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Bitte Passwort bestätigen';
+                        return 'Please confirm your password';
                       }
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 32),
-
-                  // "Sign up" Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _handleSignUp,
+                      onPressed: _loading ? null : _handleSignUp,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.oliveGreen,
-                        foregroundColor: AppTheme.whiteInput,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        elevation: 3,
                       ),
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Sign up',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w600),
+                            ),
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // "Already have an account?" Link
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Already have an account?',
-                        style: TextStyle(
-                          color: AppTheme.darkText,
-                          fontSize: 14,
-                        ),
-                      ),
+                      Text('Already have an account?',
+                          style: TextStyle(color: onSurface, fontSize: 14)),
                       TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed:
+                            _loading ? null : () => Navigator.pop(context),
                         child: Text(
                           'Sign in',
                           style: TextStyle(
-                            color: AppTheme.oliveGreen,
+                            color: theme.colorScheme.primary,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -216,7 +192,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 40),
                 ],
               ),

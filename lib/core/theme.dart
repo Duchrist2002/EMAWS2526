@@ -1,54 +1,80 @@
 import 'package:flutter/material.dart';
 
-/// UniBudget App Theme & Colors
-/// Extrahiert aus dem UI-Design (ema-login.JPG)
+/// UniBudget theme — light and dark, derived from the app's brand palette
+/// (peach + olive, extracted from the original UI design).
 class AppTheme {
-  // Primäre Farbpalette aus dem Design
-  static const Color peachBackground =
-      Color(0xFFFFBFA4); // Pfirsich-Hintergrund
-  static const Color oliveGreen = Color(0xFF728C3C); // Olivgrün für Buttons
-  static const Color darkGreen = Color(0xFF5F7E3F); // Dunkelgrün für Headlines
-  static const Color whiteInput = Color(0xFFFFFFFF); // Weiß für Input-Felder
-  static const Color darkText = Color(0xFF333333); // Dunkelgrau für Text
-  static const Color shadowColor = Color(0x33000000); // Sanfter Schatten
+  // ----- Brand colors (light) -----
+  static const Color oliveGreen = Color(0xFF728C3C);
+  static const Color darkGreen = Color(0xFF5F7E3F);
+  static const Color peachBackground = Color(0xFFFFBFA4);
+  static const Color accentOrange = Color(0xFFE4711A);
+  static const Color whiteInput = Color(0xFFFFFFFF);
+  static const Color darkText = Color(0xFF333333);
+  static const Color shadowColor = Color(0x33000000);
 
-  // ThemeData für die gesamte App
-  static ThemeData get lightTheme {
+  // ----- Dark variants -----
+  static const Color darkScaffold = Color(0xFF23201C);
+  static const Color darkSurface = Color(0xFF2E2A25);
+  static const Color darkOlive = Color(0xFF9BBE5B);
+  static const Color darkOnSurface = Color(0xFFECE6DD);
+
+  /// Soft shadow used by input fields and cards.
+  static List<BoxShadow> get inputShadow => const [
+        BoxShadow(color: shadowColor, blurRadius: 10, offset: Offset(0, 4)),
+      ];
+
+  static ThemeData get lightTheme => _build(
+        brightness: Brightness.light,
+        scaffold: peachBackground,
+        surface: whiteInput,
+        onSurface: darkText,
+        primary: oliveGreen,
+      );
+
+  static ThemeData get darkTheme => _build(
+        brightness: Brightness.dark,
+        scaffold: darkScaffold,
+        surface: darkSurface,
+        onSurface: darkOnSurface,
+        primary: darkOlive,
+      );
+
+  static ThemeData _build({
+    required Brightness brightness,
+    required Color scaffold,
+    required Color surface,
+    required Color onSurface,
+    required Color primary,
+  }) {
+    final scheme = ColorScheme(
+      brightness: brightness,
+      primary: primary,
+      onPrimary: Colors.white,
+      secondary: accentOrange,
+      onSecondary: Colors.white,
+      surface: surface,
+      onSurface: onSurface,
+      error: const Color(0xFFB3261E),
+      onError: Colors.white,
+    );
+
     return ThemeData(
-      primaryColor: oliveGreen,
-      scaffoldBackgroundColor: peachBackground,
+      useMaterial3: true,
+      brightness: brightness,
+      colorScheme: scheme,
+      scaffoldBackgroundColor: scaffold,
       fontFamily: 'Roboto',
-
-      // Text Theme
-      textTheme: const TextTheme(
-        // "Login here" - Große Headline
-        displayLarge: TextStyle(
-          fontSize: 36,
-          fontWeight: FontWeight.bold,
-          color: darkGreen,
-        ),
-        // "Welcome back! You've been missed!" - Subtitle
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          color: darkText,
-        ),
-        // Button Text
-        labelLarge: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-          color: whiteInput,
-        ),
+      textTheme: TextTheme(
+        displayLarge:
+            TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: primary),
+        bodyLarge: TextStyle(fontSize: 16, color: onSurface),
       ),
-
-      // Input Decoration Theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: whiteInput,
+        fillColor: surface,
+        hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.5), fontSize: 16),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-
-        // Stark abgerundete Ecken wie im Design
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
           borderSide: BorderSide.none,
@@ -59,40 +85,20 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: oliveGreen, width: 2),
-        ),
-
-        hintStyle: TextStyle(
-          color: darkText.withOpacity(0.5),
-          fontSize: 16,
+          borderSide: BorderSide(color: primary, width: 2),
         ),
       ),
-
-      // Elevated Button Theme
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: oliveGreen,
-          foregroundColor: whiteInput,
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           elevation: 3,
-          textStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
     );
   }
-
-  // Box Shadow für Input-Felder (wie im Design)
-  static List<BoxShadow> get inputShadow => [
-        BoxShadow(
-          color: shadowColor,
-          blurRadius: 10,
-          offset: const Offset(0, 4),
-        ),
-      ];
 }
