@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/categories.dart';
 import '../../models/transaction_model.dart';
 
 /// A single transaction row: icon, title, relative date, amount and category.
@@ -49,7 +50,8 @@ class TransactionItem extends StatelessWidget {
               color: scheme.secondary.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(transaction.icon, color: scheme.secondary),
+            child: Icon(iconForCategory(transaction.category),
+                color: scheme.secondary),
           ),
           const SizedBox(width: 14),
           Expanded(

@@ -36,6 +36,9 @@ android/key.properties
 ios/Flutter/ephemeral/
 ios/Flutter/App.framework/
 ios/Flutter/Flutter.framework/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Flutter/.last_build_id
 ios/Pods/
 ios/.symlinks/
 

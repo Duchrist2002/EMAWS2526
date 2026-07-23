@@ -121,8 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content:
-                                Text('Password reset is coming soon.'),
+                            content: Text('Password reset is coming soon.'),
                           ),
                         );
                       },

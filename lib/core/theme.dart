@@ -65,14 +65,15 @@ class AppTheme {
       scaffoldBackgroundColor: scaffold,
       fontFamily: 'Roboto',
       textTheme: TextTheme(
-        displayLarge:
-            TextStyle(fontSize: 36, fontWeight: FontWeight.bold, color: primary),
+        displayLarge: TextStyle(
+            fontSize: 36, fontWeight: FontWeight.bold, color: primary),
         bodyLarge: TextStyle(fontSize: 16, color: onSurface),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surface,
-        hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.5), fontSize: 16),
+        hintStyle:
+            TextStyle(color: onSurface.withValues(alpha: 0.5), fontSize: 16),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
         border: OutlineInputBorder(

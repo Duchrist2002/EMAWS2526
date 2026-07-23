@@ -1,8 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/theme.dart';
 import 'core/theme_controller.dart';
+import 'cubit/transactions_cubit.dart';
+import 'data/transaction_repository.dart';
 import 'firebase_options.dart';
 import 'screens/login_screen.dart';
 import 'screens/page_home.dart';
@@ -36,21 +39,24 @@ class UniBudgetApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<ThemeMode>(
-      valueListenable: ThemeController.instance.mode,
-      builder: (context, mode, _) {
-        return MaterialApp(
-          title: 'UniBudget',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.lightTheme,
-          darkTheme: AppTheme.darkTheme,
-          themeMode: mode,
-          home: const AuthGate(),
-          routes: {
-            '/signup': (context) => const SignUpScreen(),
-          },
-        );
-      },
+    return BlocProvider(
+      create: (_) => TransactionsCubit(TransactionRepository())..load(),
+      child: ValueListenableBuilder<ThemeMode>(
+        valueListenable: ThemeController.instance.mode,
+        builder: (context, mode, _) {
+          return MaterialApp(
+            title: 'UniBudget',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: mode,
+            home: const AuthGate(),
+            routes: {
+              '/signup': (context) => const SignUpScreen(),
+            },
+          );
+        },
+      ),
     );
   }
 }
