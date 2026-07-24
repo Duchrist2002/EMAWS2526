@@ -1,57 +1,44 @@
-# UniBudget
+# 💸 UniBudget
 
-A student budget-tracker built with Flutter (EMA WS25/26).
+UniBudget is a beautiful, personal finance and budgeting application designed for students. It helps you track expenses, manage your monthly budget, and visualize your spending habits through clean, intuitive charts.
 
-- **Auth**: Firebase Authentication (email + password), with a local **demo mode**
-  fallback so the app runs before you connect a Firebase project.
-- **Dashboard**: monthly summary, quick tools, and a recent-transactions list.
-- **Dark mode**: toggle in the dashboard header.
+## 🚀 Features
 
-See [ROADMAP.md](ROADMAP.md) for the plan toward a complete app.
+- **Dashboard:** At-a-glance view of your budget, total spent, and remaining balance.
+- **Expense Tracking:** Easily log expenses with categories and notes.
+- **Budget Management:** Set and edit your monthly budget dynamically.
+- **Interactive Statistics:** Visualize your spending with Bar Charts, Donut Charts, and Trend Lines.
+- **History:** Keep track of all your past transactions.
+- **Authentication:** Secure Firebase Authentication with a fallback "Demo Mode".
+- **Dark Mode:** A gorgeous dark theme that is easy on the eyes.
 
-## Run it
+## 📱 Download the APK (Android)
 
-```bash
-flutter pub get
-flutter run            # mobile / desktop
-flutter run -d chrome  # web
-```
+You can download the latest compiled version of the app directly from GitHub Actions!
 
-### Demo mode (no setup)
-If Firebase isn't configured yet, the app runs against an in-memory demo account
-so you can try the full flow immediately:
+1. Go to the **[Actions tab](https://github.com/Duchrist2002/EMAWS2526/actions)** on this repository.
+2. Click on the latest successful workflow run for **"Build Android APK"**.
+3. Scroll down to the **Artifacts** section.
+4. Click on **`UniBudget-APK`** to download the file.
+5. Transfer it to your Android device, open it, and install!
 
-```
-email:    student@uni.de
-password: 123456
-```
+## 🛠️ Architecture
 
-You can also create a new account from the Sign-Up screen (state resets on reload).
+UniBudget is built using a clean architecture pattern:
+- **State Management:** `flutter_bloc` (Cubit)
+- **Data Persistence:** `shared_preferences`
+- **Charts:** `fl_chart`
+- **Auth:** `firebase_auth`
 
-## Connect Firebase (enable real auth)
+The UI is separated from the business logic, ensuring a scalable and maintainable codebase.
 
-1. Create a project at the [Firebase console](https://console.firebase.google.com/)
-   and enable **Authentication → Email/Password**.
-2. Install the CLI and generate config:
+## 💻 Running Locally
 
-   ```bash
-   dart pub global activate flutterfire_cli
-   flutterfire configure
-   ```
+To run the project on your own machine:
 
-   This overwrites `lib/firebase_options.dart` with your project's real values.
-   Once the placeholders are gone, the app initializes Firebase automatically and
-   uses real authentication instead of demo mode.
+1. Ensure you have [Flutter installed](https://docs.flutter.dev/get-started/install).
+2. Clone this repository.
+3. Run `flutter pub get` to install dependencies.
+4. Run `flutter run` to launch the app on your connected device or emulator.
 
-## Project structure
-
-```
-lib/
-  core/          theme.dart, theme_controller.dart
-  models/        transaction_model.dart
-  services/      auth_service.dart        (Firebase + demo implementations)
-  screens/       login, signup, page_home (dashboard)
-  widgets/       custom_input_field, dashboard/ (budget card, transaction item)
-  main.dart      Firebase init + AuthGate + theming
-  firebase_options.dart   (placeholder until you run flutterfire configure)
-```
+> **Note on Firebase:** If you haven't configured Firebase locally, the app will automatically fall back to **Demo Mode**, allowing you to test the full UI without needing a backend connection.

@@ -24,7 +24,7 @@ android {
         applicationId = "com.example.helloworld"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23 // Firebase Auth requires at least Android 6.0 (API 23)
+        minSdk = flutter.minSdkVersion // Firebase Auth requires at least Android 6.0 (API 23)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
