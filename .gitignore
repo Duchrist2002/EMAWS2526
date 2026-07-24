@@ -43,8 +43,6 @@ ios/Pods/
 ios/.symlinks/
 
 # Firebase
-# google-services.json / firebase_options.dart hold client identifiers, not
-# secrets (Firebase access is enforced by Auth + security rules) — committed
-# intentionally so graders can build the app from the repo.
+# google-services.json included for grader build
 ios/Runner/GoogleService-Info.plist
 .firebase/
