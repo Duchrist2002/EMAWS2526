@@ -1,24 +1,12 @@
-// GENERATED-STYLE PLACEHOLDER — replace with your real values.
-//
-// To connect your own Firebase project, install the FlutterFire CLI and run:
-//
-//     dart pub global activate flutterfire_cli
-//     flutterfire configure
-//
-// That command overwrites this file with your project's real options.
-// Until then, `DefaultFirebaseOptions.isConfigured` stays false and the app
-// runs in a local "demo mode" (see AuthService) so it still works offline.
-//
-// Docs: https://firebase.google.com/docs/flutter/setup
+// Firebase options placeholder
 
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
-/// Default [FirebaseOptions] for use with your Firebase apps.
+// Default FirebaseOptions
 class DefaultFirebaseOptions {
-  /// Sentinel used in the placeholders below. Once you run
-  /// `flutterfire configure`, real keys replace these and this becomes true.
+  // Configured flag
   static bool get isConfigured => !web.apiKey.startsWith('REPLACE_');
 
   static FirebaseOptions get currentPlatform {

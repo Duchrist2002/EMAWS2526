@@ -4,10 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/transaction_model.dart';
 
-/// Stores the transaction list locally using shared_preferences (as JSON).
-///
-/// This is the only place that talks to storage, which keeps the Cubit and
-/// the UI free of persistence details.
+// Local transaction storage
 class TransactionRepository {
   static const _storageKey = 'transactions';
   static const _budgetKey = 'monthly_budget';
@@ -16,7 +13,7 @@ class TransactionRepository {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_storageKey);
 
-    // First launch: seed a couple of example entries so the app isn't empty.
+    // Seed initial data
     if (raw == null) {
       await _write(prefs, _seed());
       return _seed();

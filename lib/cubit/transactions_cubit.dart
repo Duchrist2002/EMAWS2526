@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/transaction_repository.dart';
 import '../models/transaction_model.dart';
 
-/// State held by [TransactionsCubit]: the current list plus a loading flag.
+// Transaction state
 class TransactionsState {
   final List<TransactionModel> transactions;
   final bool loading;
@@ -16,7 +16,7 @@ class TransactionsState {
     this.monthlyBudget = 800.0,
   });
 
-  /// Total amount spent across all transactions.
+  // Total spent
   double get total => transactions.fold(0.0, (sum, t) => sum + t.amount);
 
   TransactionsState copyWith({
@@ -32,10 +32,7 @@ class TransactionsState {
   }
 }
 
-/// Manages the transaction list and keeps it in sync with local storage.
-///
-/// Business logic lives here, separate from the widgets — the UI only reads
-/// the state and calls [add] / [remove].
+// Transaction state management
 class TransactionsCubit extends Cubit<TransactionsState> {
   final TransactionRepository _repository;
 
@@ -48,7 +45,7 @@ class TransactionsCubit extends Cubit<TransactionsState> {
       final budget = await _repository.loadBudget();
       _emitSorted(items, budget: budget);
     } catch (e) {
-      // Never leave the UI stuck on a spinner if storage is unavailable.
+      // Handle load error
       debugPrint('TransactionsCubit.load failed: $e');
       emit(const TransactionsState(transactions: [], loading: false));
     }
@@ -71,7 +68,7 @@ class TransactionsCubit extends Cubit<TransactionsState> {
     await _repository.saveBudget(newBudget);
   }
 
-  /// Emits the list newest-first so the dashboard shows recent items on top.
+  // Emit sorted items
   void _emitSorted(List<TransactionModel> items, {double? budget}) {
     final sorted = [...items]..sort((a, b) => b.date.compareTo(a.date));
     emit(TransactionsState(

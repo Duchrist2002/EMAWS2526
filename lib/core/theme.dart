@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// UniBudget theme — light and dark, derived from the app's brand palette
-/// (peach + olive, extracted from the original UI design).
+// App theme
 class AppTheme {
-  // ----- Brand colors (light) -----
+  // Light colors
   static const Color oliveGreen = Color(0xFF728C3C);
   static const Color darkGreen = Color(0xFF5F7E3F);
   static const Color peachBackground = Color(0xFFFFBFA4);
@@ -12,13 +11,13 @@ class AppTheme {
   static const Color darkText = Color(0xFF333333);
   static const Color shadowColor = Color(0x33000000);
 
-  // ----- Dark variants -----
+  // Dark colors
   static const Color darkScaffold = Color(0xFF23201C);
   static const Color darkSurface = Color(0xFF2E2A25);
   static const Color darkOlive = Color(0xFF9BBE5B);
   static const Color darkOnSurface = Color(0xFFECE6DD);
 
-  /// Soft shadow used by input fields and cards.
+  // Box shadow
   static List<BoxShadow> get inputShadow => const [
         BoxShadow(color: shadowColor, blurRadius: 10, offset: Offset(0, 4)),
       ];

@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Holds the current [ThemeMode] and lets any widget flip it.
-///
-/// Kept intentionally tiny (a global [ValueNotifier]) — no state-management
-/// package needed for a project this size. `MaterialApp` listens to [mode].
+// Manage theme mode
 class ThemeController {
   ThemeController._();
   static final ThemeController instance = ThemeController._();

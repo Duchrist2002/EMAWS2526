@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// The expense categories a user can choose from.
+// Expense categories
 const List<String> kCategories = [
   'Food & Drinks',
   'Shopping',
@@ -10,7 +10,7 @@ const List<String> kCategories = [
   'Other',
 ];
 
-/// Maps a category to the icon shown next to it.
+// Category icons
 IconData iconForCategory(String category) {
   switch (category) {
     case 'Food & Drinks':

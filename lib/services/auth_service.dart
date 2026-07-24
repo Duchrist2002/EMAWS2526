@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import 'package:firebase_core/firebase_core.dart';
 
-/// App-level user, independent of the auth backend.
+// App user
 class AppUser {
   final String uid;
   final String? email;
@@ -11,7 +11,7 @@ class AppUser {
   const AppUser({required this.uid, this.email, this.displayName});
 }
 
-/// Thrown by [AuthService] with a message that is safe to show the user.
+// Auth exception
 class AuthException implements Exception {
   final String message;
   AuthException(this.message);
@@ -19,11 +19,7 @@ class AuthException implements Exception {
   String toString() => message;
 }
 
-/// Authentication boundary used by the UI.
-///
-/// [instance] resolves to [FirebaseAuthService] when a Firebase app has been
-/// initialised (i.e. you ran `flutterfire configure`), otherwise to
-/// [DemoAuthService] so the app still runs offline for presentations.
+// Authentication boundary
 abstract class AuthService {
   Stream<AppUser?> authState();
   AppUser? get currentUser;
@@ -41,7 +37,7 @@ abstract class AuthService {
       Firebase.apps.isNotEmpty ? FirebaseAuthService() : DemoAuthService();
 }
 
-/// Real Firebase Authentication (email + password).
+// Real Firebase Auth
 class FirebaseAuthService implements AuthService {
   final fb.FirebaseAuth _auth = fb.FirebaseAuth.instance;
 
@@ -113,9 +109,7 @@ class FirebaseAuthService implements AuthService {
   }
 }
 
-/// In-memory stand-in used when Firebase is not configured.
-///
-/// Comes seeded with a demo account so you can sign in immediately:
+// Demo auth service
 ///   email: student@uni.de   password: 123456
 /// It also supports sign-up and enforces basic errors, so the auth UI can be
 /// demonstrated end-to-end without any backend. State resets on reload.
