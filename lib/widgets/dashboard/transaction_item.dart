@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
+import '../../core/categories.dart';
 import '../../models/transaction_model.dart';
 
+/// A single transaction row: icon, title, relative date, amount and category.
 class TransactionItem extends StatelessWidget {
   final TransactionModel transaction;
 
-  const TransactionItem({
-    Key? key,
-    required this.transaction,
-  }) : super(key: key);
+  const TransactionItem({super.key, required this.transaction});
 
   String _formatDate(DateTime date) {
     final now = DateTime.now();
@@ -26,18 +26,17 @@ class TransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color cardBackground = Colors.white;
-    const Color darkOlive = Color(0xFF345135);
+    final scheme = Theme.of(context).colorScheme;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: cardBackground,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: darkOlive.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 8,
             offset: const Offset(0, 6),
           ),
@@ -48,13 +47,11 @@ class TransactionItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFE2C7),
+              color: scheme.secondary.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              transaction.icon,
-              color: darkOlive,
-            ),
+            child: Icon(iconForCategory(transaction.category),
+                color: scheme.secondary),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -63,8 +60,8 @@ class TransactionItem extends StatelessWidget {
               children: [
                 Text(
                   transaction.title,
-                  style: const TextStyle(
-                    color: darkOlive,
+                  style: TextStyle(
+                    color: scheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
@@ -73,7 +70,7 @@ class TransactionItem extends StatelessWidget {
                 Text(
                   _formatDate(transaction.date),
                   style: TextStyle(
-                    color: darkOlive.withOpacity(0.6),
+                    color: scheme.onSurface.withValues(alpha: 0.6),
                     fontSize: 12,
                   ),
                 ),
@@ -85,8 +82,8 @@ class TransactionItem extends StatelessWidget {
             children: [
               Text(
                 '-\$${transaction.amount.toStringAsFixed(2)}',
-                style: const TextStyle(
-                  color: darkOlive,
+                style: TextStyle(
+                  color: scheme.onSurface,
                   fontSize: 15,
                   fontWeight: FontWeight.w600,
                 ),
@@ -95,7 +92,7 @@ class TransactionItem extends StatelessWidget {
               Text(
                 transaction.category,
                 style: TextStyle(
-                  color: darkOlive.withOpacity(0.6),
+                  color: scheme.onSurface.withValues(alpha: 0.6),
                   fontSize: 12,
                 ),
               ),

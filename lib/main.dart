@@ -1,98 +1,85 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'core/theme.dart';
-import 'screens/login_screen.dart';
-import 'screens/signup_screen.dart';
-import 'screens/dashboard_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-/// UniBudget Main App Entry Point
-/// Mit Routing für Login, Sign-Up und später Dashboard
-void main() => runApp(const UniBudgetApp());
+import 'core/theme.dart';
+import 'core/theme_controller.dart';
+import 'cubit/transactions_cubit.dart';
+import 'data/transaction_repository.dart';
+import 'firebase_options.dart';
+import 'screens/login_screen.dart';
+import 'screens/page_home.dart';
+import 'screens/signup_screen.dart';
+import 'services/auth_service.dart';
+
+/// UniBudget — a student budget tracker.
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Only initialise Firebase once you've run `flutterfire configure`.
+  // Until then the app runs in local demo mode (see AuthService).
+  if (DefaultFirebaseOptions.isConfigured) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+    } catch (e) {
+      debugPrint('Firebase init failed, falling back to demo mode: $e');
+    }
+  } else {
+    debugPrint('⚠️  Firebase not configured — running in local demo mode. '
+        'Run `flutterfire configure` to enable real authentication.');
+  }
+
+  runApp(const UniBudgetApp());
+}
 
 class UniBudgetApp extends StatelessWidget {
-  const UniBudgetApp({Key? key}) : super(key: key);
+  const UniBudgetApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'UniBudget',
-      debugShowCheckedModeBanner: false,
+    return BlocProvider(
+      create: (_) => TransactionsCubit(TransactionRepository())..load(),
+      child: ValueListenableBuilder<ThemeMode>(
+        valueListenable: ThemeController.instance.mode,
+        builder: (context, mode, _) {
+          return MaterialApp(
+            title: 'UniBudget',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: mode,
+            home: const AuthGate(),
+            routes: {
+              '/signup': (context) => const SignUpScreen(),
+            },
+          );
+        },
+      ),
+    );
+  }
+}
 
-      // App Theme aus theme.dart
-      theme: AppTheme.lightTheme,
+/// Shows the dashboard when a user is signed in, otherwise the login screen.
+/// Reacts to sign-in / sign-out automatically via [AuthService.authState].
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
 
-      // Start mit Login Screen
-      initialRoute: '/',
-
-      // Routing Setup
-      routes: {
-        '/': (context) => const LoginScreen(),
-        '/signup': (context) => const SignUpScreen(),
-        // TODO: Dashboard und weitere Screens hinzufügen
-        '/dashboard': (context) => const DashboardScreen(),
-        // '/add-expense': (context) => const AddExpenseScreen(),
-        // '/history': (context) => const HistoryScreen(),
-        // '/statistics': (context) => const StatisticsScreen(),
-        // '/settings': (context) => const SettingsScreen(),
-      },
-
-      // Temporärer Fallback für Dashboard (bis implementiert)
-      onUnknownRoute: (settings) {
-        return MaterialPageRoute(
-          builder: (context) => Scaffold(
-            backgroundColor: AppTheme.peachBackground,
-            appBar: AppBar(
-              title: const Text('UniBudget'),
-              backgroundColor: AppTheme.oliveGreen,
-            ),
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.account_balance_wallet,
-                    size: 100,
-                    color: AppTheme.oliveGreen,
-                  ),
-                  const SizedBox(height: 24),
-                  Text(
-                    'Dashboard',
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: AppTheme.darkGreen,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Wird bald implementiert!',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: AppTheme.darkText,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        '/',
-                        (route) => false,
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.oliveGreen,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                    ),
-                    child: const Text('Zurück zum Login'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<AppUser?>(
+      stream: AuthService.instance.authState(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasData && snapshot.data != null) {
+          return const PageHome();
+        }
+        return const LoginScreen();
       },
     );
   }

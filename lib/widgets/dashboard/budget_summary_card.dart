@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// A summary tile (title, big amount, subtitle). Adapts to the active theme.
 class BudgetSummaryCard extends StatelessWidget {
   final String title;
   final String amountText;
@@ -7,28 +8,26 @@ class BudgetSummaryCard extends StatelessWidget {
   final bool isLarge;
 
   const BudgetSummaryCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.amountText,
     required this.subtitle,
     this.isLarge = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Colors taken from the dashboard design
-    const Color cardBackground = Colors.white;
-    const Color darkOlive = Color(0xFF345135);
+    final scheme = Theme.of(context).colorScheme;
 
     return Container(
       width: isLarge ? double.infinity : null,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: cardBackground,
+        color: scheme.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: darkOlive.withOpacity(0.12),
+            color: Colors.black.withValues(alpha: 0.10),
             blurRadius: 10,
             offset: const Offset(0, 8),
           ),
@@ -39,8 +38,8 @@ class BudgetSummaryCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              color: darkOlive,
+            style: TextStyle(
+              color: scheme.onSurface.withValues(alpha: 0.75),
               fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
@@ -48,9 +47,9 @@ class BudgetSummaryCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             amountText,
-            style: const TextStyle(
-              color: darkOlive,
-              fontSize: 32,
+            style: TextStyle(
+              color: scheme.primary,
+              fontSize: isLarge ? 34 : 26,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -58,7 +57,7 @@ class BudgetSummaryCard extends StatelessWidget {
           Text(
             subtitle,
             style: TextStyle(
-              color: darkOlive.withOpacity(0.7),
+              color: scheme.onSurface.withValues(alpha: 0.6),
               fontSize: 13,
             ),
           ),

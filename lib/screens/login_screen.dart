@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../core/theme.dart';
+
+import '../services/auth_service.dart';
 import '../widgets/custom_input_field.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -13,6 +14,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _loading = false;
 
   @override
   void dispose() {
@@ -21,20 +23,42 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // TODO: Implementiere Firebase Auth Login
   Future<void> _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      // Temporär: Navigation zum Dashboard
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
-      }
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _loading = true);
+    try {
+      await AuthService.instance.signIn(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+      // On success AuthGate swaps to the dashboard automatically.
+      if (mounted) Navigator.of(context).popUntil((r) => r.isFirst);
+    } on AuthException catch (e) {
+      _showError(e.message);
+    } catch (_) {
+      _showError('Something went wrong. Please try again.');
+    } finally {
+      if (mounted) setState(() => _loading = false);
     }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).colorScheme.error,
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final onSurface = theme.colorScheme.onSurface;
+
     return Scaffold(
-      backgroundColor: AppTheme.peachBackground,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -45,31 +69,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 40),
-
-                  // "Login here" - Große Headline
                   Text(
                     'Login here',
-                    style: Theme.of(context).textTheme.displayLarge!.copyWith(
-                          color: AppTheme.darkGreen,
-                          fontSize: 36,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    style: theme.textTheme.displayLarge!
+                        .copyWith(fontSize: 36, fontWeight: FontWeight.bold),
                   ),
-
                   const SizedBox(height: 16),
-
                   Text(
                     "Welcome back! You've been missed!",
-                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                          color: AppTheme.darkText,
-                          fontSize: 18,
-                        ),
+                    style: TextStyle(color: onSurface, fontSize: 18),
                     textAlign: TextAlign.center,
                   ),
-
+                  if (AuthService.instance.isDemo) ...[
+                    const SizedBox(height: 20),
+                    _DemoHint(),
+                  ],
                   const SizedBox(height: 48),
-
-                  // Email Input Field
                   CustomInputField(
                     controller: _emailController,
                     hintText: 'Email',
@@ -77,18 +92,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Bitte E-Mail eingeben';
+                        return 'Please enter your email';
                       }
-                      if (!value.contains('@')) {
-                        return 'Ungültige E-Mail';
-                      }
+                      if (!value.contains('@')) return 'Invalid email address';
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 20),
-
-                  // Password Input Field
                   CustomInputField(
                     controller: _passwordController,
                     hintText: 'Password',
@@ -96,110 +106,113 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: true,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Bitte Passwort eingeben';
+                        return 'Please enter your password';
                       }
                       if (value.length < 6) {
-                        return 'Passwort muss mindestens 6 Zeichen lang sein';
+                        return 'Password must be at least 6 characters';
                       }
                       return null;
                     },
                   ),
-
                   const SizedBox(height: 16),
-
                   Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text(
-                                'Passwort-Zurücksetzen wird später implementiert'),
+                            content: Text('Password reset is coming soon.'),
                           ),
                         );
                       },
                       child: Text(
                         'Forgot your password?',
                         style: TextStyle(
-                          color: AppTheme.darkText,
+                          color: onSurface,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // "Sign in" Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: _handleLogin,
+                      onPressed: _loading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.oliveGreen,
-                        foregroundColor: AppTheme.whiteInput,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        elevation: 3,
                       ),
-                      child: const Text(
-                        'Sign in',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text(
+                              'Sign in',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w600),
+                            ),
                     ),
                   ),
-
                   const SizedBox(height: 24),
-
-                  // "New here?" Text
-                  Text(
-                    'New here?',
-                    style: TextStyle(
-                      color: AppTheme.darkText,
-                      fontSize: 14,
-                    ),
-                  ),
-
+                  Text('New here?',
+                      style: TextStyle(color: onSurface, fontSize: 14)),
                   const SizedBox(height: 16),
-
-                  // "Create new account" Button
                   SizedBox(
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/signup');
-                      },
+                      onPressed: _loading
+                          ? null
+                          : () => Navigator.pushNamed(context, '/signup'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.oliveGreen,
-                        foregroundColor: AppTheme.whiteInput,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        elevation: 3,
                       ),
                       child: const Text(
                         'Create new account',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                        ),
+                            fontSize: 18, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 40),
                 ],
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Small banner shown only when Firebase isn't configured yet.
+class _DemoHint extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: scheme.secondary.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: scheme.secondary.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        'Demo mode · try  student@uni.de  /  123456',
+        style: TextStyle(
+            color: scheme.onSurface, fontSize: 13, fontWeight: FontWeight.w500),
+        textAlign: TextAlign.center,
       ),
     );
   }

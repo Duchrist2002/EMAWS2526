@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "52016585420",
+    "project_id": "unibudget-57295",
+    "storage_bucket": "unibudget-57295.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:52016585420:android:61366323e8dd4be30b4069",
+        "android_client_info": {
+          "package_name": "com.example.helloworld"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "52016585420-1c6ntgua241vgqn9f59o3occkke614o2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjPe7Bhmz35zIYpCveGKJ0zx8hbYHEQeQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "52016585420-1c6ntgua241vgqn9f59o3occkke614o2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
