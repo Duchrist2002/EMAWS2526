@@ -19,24 +19,28 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
+  final _noteController = TextEditingController();
   String _category = kCategories.first;
 
   @override
   void dispose() {
     _titleController.dispose();
     _amountController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
   void _save() {
     if (!_formKey.currentState!.validate()) return;
 
+    final noteText = _noteController.text.trim();
     final transaction = TransactionModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: _titleController.text.trim(),
       amount: double.parse(_amountController.text.replaceAll(',', '.')),
       date: DateTime.now(),
       category: _category,
+      note: noteText.isEmpty ? null : noteText,
     );
 
     context.read<TransactionsCubit>().add(transaction);
@@ -117,6 +121,18 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       .toList(),
                   onChanged: (value) =>
                       setState(() => _category = value ?? _category),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _noteController,
+                  maxLines: 3,
+                  textCapitalization: TextCapitalization.sentences,
+                  decoration: const InputDecoration(
+                    labelText: 'Note (optional)',
+                    hintText: 'e.g. Weekly grocery shopping',
+                    prefixIcon: Icon(Icons.notes_outlined),
+                    alignLabelWithHint: true,
+                  ),
                 ),
                 const SizedBox(height: 28),
                 SizedBox(

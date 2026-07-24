@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../core/theme.dart';
-import '../core/theme_controller.dart';
 import '../cubit/transactions_cubit.dart';
 import '../services/auth_service.dart';
 import '../widgets/dashboard/budget_summary_card.dart';
 import '../widgets/dashboard/transaction_item.dart';
-import 'add_transaction_screen.dart';
 
 class PageHome extends StatelessWidget {
   const PageHome({super.key});
@@ -22,21 +20,13 @@ class PageHome extends StatelessWidget {
         ? user!.displayName!.trim().split(' ').first
         : (user?.email?.split('@').first ?? 'there');
 
-    const saved = 220.0;
-    const goal = 800.0;
-
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const AddTransactionScreen()),
-        ),
-        icon: const Icon(Icons.add),
-        label: const Text('Add expense'),
-      ),
       body: SafeArea(
         child: BlocBuilder<TransactionsCubit, TransactionsState>(
           builder: (context, state) {
             final spent = state.total;
+            final budget = state.monthlyBudget;
+            final saved = budget - spent;
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,30 +56,6 @@ class PageHome extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                            ),
-                            Icon(
-                              isDark ? Icons.dark_mode : Icons.light_mode,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                            Switch(
-                              value: isDark,
-                              activeThumbColor: Colors.white,
-                              activeTrackColor: Colors.white24,
-                              onChanged: (v) =>
-                                  ThemeController.instance.setDark(v),
-                            ),
-                            IconButton(
-                              tooltip: 'Log out',
-                              icon:
-                                  const Icon(Icons.logout, color: Colors.white),
-                              onPressed: () async {
-                                await AuthService.instance.signOut();
-                                if (context.mounted) {
-                                  Navigator.of(context)
-                                      .popUntil((r) => r.isFirst);
-                                }
-                              },
                             ),
                           ],
                         ),
@@ -131,12 +97,26 @@ class PageHome extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // ---------- Summary ----------
-                        BudgetSummaryCard(
-                          isLarge: true,
-                          title: 'Spent this month',
-                          amountText: '\$${spent.toStringAsFixed(2)}',
-                          subtitle:
-                              'of your \$${goal.toStringAsFixed(0)} budget',
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            BudgetSummaryCard(
+                              isLarge: true,
+                              title: 'Spent this month',
+                              amountText: '\$${spent.toStringAsFixed(2)}',
+                              subtitle:
+                                  'of your \$${budget.toStringAsFixed(0)} budget',
+                            ),
+                            Positioned(
+                              bottom: 16,
+                              right: 16,
+                              child: FloatingActionButton.small(
+                                backgroundColor: Theme.of(context).colorScheme.primary,
+                                onPressed: () => _showEditBudgetDialog(context, budget),
+                                child: const Icon(Icons.edit, color: Colors.white),
+                              ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 24),
@@ -163,11 +143,11 @@ class PageHome extends StatelessWidget {
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: BudgetSummaryCard(
-                                title: 'Goal',
-                                amountText: '\$${goal.toStringAsFixed(0)}',
-                                subtitle: 'target',
-                              ),
+                                child: BudgetSummaryCard(
+                                  title: 'Goal',
+                                  amountText: '\$${budget.toStringAsFixed(0)}',
+                                  subtitle: 'target',
+                                ),
                             ),
                           ],
                         ),
@@ -200,6 +180,40 @@ class PageHome extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface,
         ),
       );
+
+  void _showEditBudgetDialog(BuildContext context, double currentBudget) {
+    final controller =
+        TextEditingController(text: currentBudget.toStringAsFixed(0));
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Edit Monthly Budget'),
+        content: TextField(
+          controller: controller,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(
+            labelText: 'Budget (\$)',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newBudget = double.tryParse(controller.text);
+              if (newBudget != null && newBudget >= 0) {
+                context.read<TransactionsCubit>().setBudget(newBudget);
+              }
+              Navigator.pop(ctx);
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Shows a spinner while loading, an empty hint, or the transaction list.

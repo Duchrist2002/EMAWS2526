@@ -8,10 +8,12 @@ import '../models/transaction_model.dart';
 class TransactionsState {
   final List<TransactionModel> transactions;
   final bool loading;
+  final double monthlyBudget;
 
   const TransactionsState({
     this.transactions = const [],
     this.loading = true,
+    this.monthlyBudget = 800.0,
   });
 
   /// Total amount spent across all transactions.
@@ -20,10 +22,12 @@ class TransactionsState {
   TransactionsState copyWith({
     List<TransactionModel>? transactions,
     bool? loading,
+    double? monthlyBudget,
   }) {
     return TransactionsState(
       transactions: transactions ?? this.transactions,
       loading: loading ?? this.loading,
+      monthlyBudget: monthlyBudget ?? this.monthlyBudget,
     );
   }
 }
@@ -41,7 +45,8 @@ class TransactionsCubit extends Cubit<TransactionsState> {
     emit(state.copyWith(loading: true));
     try {
       final items = await _repository.loadAll();
-      _emitSorted(items);
+      final budget = await _repository.loadBudget();
+      _emitSorted(items, budget: budget);
     } catch (e) {
       // Never leave the UI stuck on a spinner if storage is unavailable.
       debugPrint('TransactionsCubit.load failed: $e');
@@ -61,9 +66,18 @@ class TransactionsCubit extends Cubit<TransactionsState> {
     await _repository.saveAll(updated);
   }
 
+  Future<void> setBudget(double newBudget) async {
+    emit(state.copyWith(monthlyBudget: newBudget));
+    await _repository.saveBudget(newBudget);
+  }
+
   /// Emits the list newest-first so the dashboard shows recent items on top.
-  void _emitSorted(List<TransactionModel> items) {
+  void _emitSorted(List<TransactionModel> items, {double? budget}) {
     final sorted = [...items]..sort((a, b) => b.date.compareTo(a.date));
-    emit(TransactionsState(transactions: sorted, loading: false));
+    emit(TransactionsState(
+      transactions: sorted,
+      loading: false,
+      monthlyBudget: budget ?? state.monthlyBudget,
+    ));
   }
 }

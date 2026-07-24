@@ -7,8 +7,8 @@ import 'core/theme_controller.dart';
 import 'cubit/transactions_cubit.dart';
 import 'data/transaction_repository.dart';
 import 'firebase_options.dart';
+import 'screens/app_shell.dart';
 import 'screens/login_screen.dart';
-import 'screens/page_home.dart';
 import 'screens/signup_screen.dart';
 import 'services/auth_service.dart';
 
@@ -77,7 +77,7 @@ class AuthGate extends StatelessWidget {
           );
         }
         if (snapshot.hasData && snapshot.data != null) {
-          return const PageHome();
+          return const AppShell();
         }
         return const LoginScreen();
       },

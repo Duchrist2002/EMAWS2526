@@ -9,6 +9,7 @@ class TransactionModel {
   final double amount;
   final DateTime date;
   final String category;
+  final String? note;
 
   const TransactionModel({
     required this.id,
@@ -16,6 +17,7 @@ class TransactionModel {
     required this.amount,
     required this.date,
     required this.category,
+    this.note,
   });
 
   Map<String, dynamic> toJson() => {
@@ -24,6 +26,7 @@ class TransactionModel {
         'amount': amount,
         'date': date.toIso8601String(),
         'category': category,
+        if (note != null) 'note': note,
       };
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
@@ -33,6 +36,7 @@ class TransactionModel {
       amount: (json['amount'] as num).toDouble(),
       date: DateTime.parse(json['date'] as String),
       category: json['category'] as String,
+      note: json['note'] as String?,
     );
   }
 }

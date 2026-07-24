@@ -10,6 +10,7 @@ import '../models/transaction_model.dart';
 /// the UI free of persistence details.
 class TransactionRepository {
   static const _storageKey = 'transactions';
+  static const _budgetKey = 'monthly_budget';
 
   Future<List<TransactionModel>> loadAll() async {
     final prefs = await SharedPreferences.getInstance();
@@ -36,6 +37,16 @@ class TransactionRepository {
       SharedPreferences prefs, List<TransactionModel> transactions) {
     final raw = jsonEncode(transactions.map((t) => t.toJson()).toList());
     return prefs.setString(_storageKey, raw);
+  }
+
+  Future<double> loadBudget() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getDouble(_budgetKey) ?? 800.0;
+  }
+
+  Future<void> saveBudget(double budget) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble(_budgetKey, budget);
   }
 
   List<TransactionModel> _seed() => [
