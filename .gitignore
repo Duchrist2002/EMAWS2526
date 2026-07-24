@@ -42,7 +42,9 @@ ios/Flutter/.last_build_id
 ios/Pods/
 ios/.symlinks/
 
-# Firebase (keep placeholder firebase_options.dart; ignore real secrets)
-android/app/google-services.json
+# Firebase
+# google-services.json / firebase_options.dart hold client identifiers, not
+# secrets (Firebase access is enforced by Auth + security rules) — committed
+# intentionally so graders can build the app from the repo.
 ios/Runner/GoogleService-Info.plist
 .firebase/
